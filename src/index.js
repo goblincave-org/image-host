@@ -1,42 +1,43 @@
-const OWNER = "goblincave-git";  // Your GitHub username
-const REPO = "image-host";       // Your GitHub repository name
-const BRANCH = "main";           // The default branch, usually "main" or "master"
+const OWNER = "goblincave-git";  // Replace with your GitHub username
+const REPO = "image-host";       // Replace with your GitHub repository name
+const BRANCH = "main";           // Use your default branch (e.g., main)
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    let path = decodeURIComponent(url.pathname.replace(/^\/+/, ""));  // Remove leading slashes
-
-    // Ensure the path is not empty (root directory)
-    if (path === "") {
-      path = "";  // Default to the root directory if no path is provided
-    }
+    let path = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
 
     const apiURL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`;
 
-    // Debugging: Log the API URL to ensure it's being generated correctly
-    console.log("GitHub API URL:", apiURL);
+    // Log the API URL for debugging
+    console.log('API URL:', apiURL);
 
+    // Fetch the GitHub contents, using the token for private repos
     const gh = await fetch(apiURL, {
       headers: {
         "User-Agent": "cf-github-autoindex",
-        ...(env.GITHUB_TOKEN && { "Authorization": `Bearer ${env.GITHUB_TOKEN}` })  // Add token if needed
+        ...(env.GITHUB_TOKEN && {
+          "Authorization": `Bearer ${env.GITHUB_TOKEN}`  // Authentication using GitHub Token
+        })
       }
     });
 
+    // Log the response status
+    console.log('GitHub API response status:', gh.status);
+
     if (!gh.ok) {
-      console.log("GitHub API returned an error:", gh.status);
       return new Response("404 Not Found", { status: 404 });
     }
 
     const data = await gh.json();
 
-    // If it's a file, redirect to the raw file URL
+    // Log the API response for debugging
+    console.log('GitHub API response body:', data);
+
     if (!Array.isArray(data)) {
       return Response.redirect(data.download_url, 302);
     }
 
-    // Render the directory listing (index)
     return new Response(renderIndex(path, data), {
       headers: { "content-type": "text/html; charset=utf-8" }
     });
@@ -51,17 +52,14 @@ function renderIndex(path, items) {
 
   let rows = "";
 
-  // Add parent directory if we are in a subdirectory
   if (path) {
     rows += `<tr><td>📁</td><td><a href="/${parent}">../</a></td><td></td></tr>`;
   }
 
-  // Loop through and add directories
   for (const d of dirs) {
     rows += `<tr><td>📁</td><td><a href="/${d.path}/">${d.name}/</a></td><td></td></tr>`;
   }
 
-  // Loop through and add files
   for (const f of files) {
     rows += `<tr><td>🖼️</td><td><a href="/${f.path}">${f.name}</a></td><td>${formatSize(f.size)}</td></tr>`;
   }
