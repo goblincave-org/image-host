@@ -5,15 +5,18 @@ const BRANCH = "main";           // The default branch, usually "main" or "maste
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    let path = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
+    let path = decodeURIComponent(url.pathname.replace(/^\/+/, ""));  // Remove leading slashes
 
-    // Build the GitHub API URL for the given path
+    // Ensure the path is not empty (root directory)
+    if (path === "") {
+      path = "";  // Default to the root directory if no path is provided
+    }
+
     const apiURL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`;
 
-    // Log the API URL for debugging
-    console.log('API URL:', apiURL);
+    // Debugging: Log the API URL to ensure it's being generated correctly
+    console.log("GitHub API URL:", apiURL);
 
-    // Fetch the GitHub contents, using the token for private repos
     const gh = await fetch(apiURL, {
       headers: {
         "User-Agent": "cf-github-autoindex",
@@ -28,11 +31,8 @@ export default {
 
     const data = await gh.json();
 
-    // Log the API response for debugging
-    console.log('GitHub API response body:', data);
-
+    // If it's a file, redirect to the raw file URL
     if (!Array.isArray(data)) {
-      // Redirect to raw file if it's a file, not a directory
       return Response.redirect(data.download_url, 302);
     }
 
@@ -51,6 +51,7 @@ function renderIndex(path, items) {
 
   let rows = "";
 
+  // Add parent directory if we are in a subdirectory
   if (path) {
     rows += `<tr><td>📁</td><td><a href="/${parent}">../</a></td><td></td></tr>`;
   }
@@ -60,6 +61,7 @@ function renderIndex(path, items) {
     rows += `<tr><td>📁</td><td><a href="/${d.path}/">${d.name}/</a></td><td></td></tr>`;
   }
 
+  // Loop through and add files
   for (const f of files) {
     rows += `<tr><td>🖼️</td><td><a href="/${f.path}">${f.name}</a></td><td>${formatSize(f.size)}</td></tr>`;
   }
