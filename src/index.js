@@ -1,29 +1,21 @@
-const OWNER = "goblincave-git";  // Replace with your GitHub username
-const REPO = "image-host";       // Replace with your GitHub repository name
-const BRANCH = "main";           // Use your default branch (e.g., main)
+const OWNER = "goblincave-git";  // Your GitHub username
+const REPO = "image-host";       // Your GitHub repository name
+const BRANCH = "main";           // The default branch, usually "main" or "master"
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    let path = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
+    let path = decodeURIComponent(url.pathname.replace(/^\/+/, "")) || '';  // Defaults to '' (root)
 
+    // Build the GitHub API URL for the given path
     const apiURL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`;
 
-    // Log the API URL for debugging
-    console.log('API URL:', apiURL);
-
-    // Fetch the GitHub contents, using the token for private repos
     const gh = await fetch(apiURL, {
       headers: {
         "User-Agent": "cf-github-autoindex",
-        ...(env.GITHUB_TOKEN && {
-          "Authorization": `Bearer ${env.GITHUB_TOKEN}`  // Authentication using GitHub Token
-        })
+        ...(env.GITHUB_TOKEN && { "Authorization": `Bearer ${env.GITHUB_TOKEN}` })  // Add token if needed
       }
     });
-
-    // Log the response status
-    console.log('GitHub API response status:', gh.status);
 
     if (!gh.ok) {
       return new Response("404 Not Found", { status: 404 });
@@ -31,10 +23,8 @@ export default {
 
     const data = await gh.json();
 
-    // Log the API response for debugging
-    console.log('GitHub API response body:', data);
-
     if (!Array.isArray(data)) {
+      // Redirect to raw file if it's a file, not a directory
       return Response.redirect(data.download_url, 302);
     }
 
@@ -52,14 +42,17 @@ function renderIndex(path, items) {
 
   let rows = "";
 
+  // Add parent directory if we are in a subdirectory
   if (path) {
     rows += `<tr><td>📁</td><td><a href="/${parent}">../</a></td><td></td></tr>`;
   }
 
+  // Loop through and add directories
   for (const d of dirs) {
     rows += `<tr><td>📁</td><td><a href="/${d.path}/">${d.name}/</a></td><td></td></tr>`;
   }
 
+  // Loop through and add files
   for (const f of files) {
     rows += `<tr><td>🖼️</td><td><a href="/${f.path}">${f.name}</a></td><td>${formatSize(f.size)}</td></tr>`;
   }
