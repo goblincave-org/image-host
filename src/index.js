@@ -1,5 +1,5 @@
-const OWNER = "YOUR_GITHUB_USERNAME";
-const REPO = "YOUR_REPO_NAME";
+const OWNER = "goblincave-org";
+const REPO = "image-host";
 const BRANCH = "main";
 
 export default {
