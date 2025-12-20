@@ -1,6 +1,6 @@
-const OWNER = "goblincave-org";
-const REPO = "image-host";
-const BRANCH = "main";
+const OWNER = "goblincave-git";  // Replace with your GitHub username
+const REPO = "image-host";       // Replace with your GitHub repository name
+const BRANCH = "main";           // Use your default branch (e.g., main)
 
 export default {
   async fetch(request, env) {
@@ -9,14 +9,21 @@ export default {
 
     const apiURL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`;
 
+    // Log the API URL for debugging
+    console.log('API URL:', apiURL);
+
+    // Fetch the GitHub contents, using the token for private repos
     const gh = await fetch(apiURL, {
       headers: {
         "User-Agent": "cf-github-autoindex",
         ...(env.GITHUB_TOKEN && {
-          "Authorization": `Bearer ${env.GITHUB_TOKEN}`
+          "Authorization": `Bearer ${env.GITHUB_TOKEN}`  // Authentication using GitHub Token
         })
       }
     });
+
+    // Log the response status
+    console.log('GitHub API response status:', gh.status);
 
     if (!gh.ok) {
       return new Response("404 Not Found", { status: 404 });
@@ -24,7 +31,9 @@ export default {
 
     const data = await gh.json();
 
-    // File → redirect to raw file
+    // Log the API response for debugging
+    console.log('GitHub API response body:', data);
+
     if (!Array.isArray(data)) {
       return Response.redirect(data.download_url, 302);
     }
