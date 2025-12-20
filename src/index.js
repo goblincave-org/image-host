@@ -1,6 +1,6 @@
-const OWNER = "goblincave-org";  // Replace with your GitHub username
-const REPO = "image-host";         // Replace with your GitHub repository name
-const BRANCH = "main";                 // Use your default branch (e.g., main)
+const OWNER = "goblincave-org";
+const REPO = "image-host";
+const BRANCH = "main";
 
 export default {
   async fetch(request, env) {
