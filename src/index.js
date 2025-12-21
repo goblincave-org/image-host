@@ -66,11 +66,6 @@ function renderIndex(path, items) {
     table { border-collapse: collapse }
     td { padding: 2px 8px }
     a { text-decoration: none }
-
-    * {
-        margin:	0% 0% 0% 0%;
-        padding: 0;
-      }
   </style>
 </head>
 <body>
