@@ -1,3 +1,5 @@
+# Wrangler file for the Cloudflare Worker
+
 name = "image-host"
 main = "src/index.js"
 compatibility_date = "2025-12-20"
