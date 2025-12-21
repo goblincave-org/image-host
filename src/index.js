@@ -59,7 +59,7 @@ function renderIndex(path, items) {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Index of /${path}</title>
+  <title>Goblin Hosting Inc.</title>
   <style>
     body { font-family: monospace; padding: 20px }
     table { border-collapse: collapse }
@@ -68,6 +68,7 @@ function renderIndex(path, items) {
   </style>
 </head>
 <body>
+<p>Contact: contact@goblincave.org</p>
 <h2>Index of /${path}</h2>
 <table>${rows}</table>
 </body>
