@@ -60,7 +60,7 @@ function renderIndex(path, items) {
 <head>
   <meta charset="utf-8">
   <title>Goblin Hosting Inc.</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/goblincave-org/image-host/main/src/favicon.png">
   <style>
     body { font-family: monospace; padding: 20px }
     table { border-collapse: collapse }
@@ -70,7 +70,7 @@ function renderIndex(path, items) {
 </head>
 <body>
 <p>This is a personal image hosting website for the Goblin Cave.</p>
-<p>Inquiries can be sent to contact@goblincave.org</p>>
+<p>Inquiries can be sent to contact@goblincave.org</p>
 <p>I do not claim any rights to the images hosted here. All rights belong to their respective owners.</p>
 <hr>
 <h2>Index of /${path}</h2>
